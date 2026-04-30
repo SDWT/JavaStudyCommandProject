@@ -1,13 +1,9 @@
 package com.example.sortapp;
 
-/**
- * Hello world!
- *
- */
-public class Main 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+import com.example.sortapp.ui.ConsoleUI;
+
+public class Main {
+    public static void main(String[] args) {
+        new ConsoleUI().start();
     }
 }
