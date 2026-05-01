@@ -10,10 +10,10 @@ public class User implements Comparable<User>{
     private final int birthYear;
 
 
-    public User(String name, String email, int birthYear) {
-        this.name = name;
-        this.email = email;
-        this.birthYear = birthYear;
+    private User(UserBuilder userBuilder){
+        this.name = userBuilder.name;
+        this.email = userBuilder.email;
+        this.birthYear = userBuilder.birthYear;
     }
 
     public String getName() {
@@ -55,5 +55,32 @@ public class User implements Comparable<User>{
                 .thenComparing(User::getEmail)
                 .thenComparingInt(User::getBirthYear)
                 .compare(this, other);
+    }
+
+
+    public static class UserBuilder{
+        private String name;
+        private String email;
+        private int birthYear;
+
+        public UserBuilder setName(String name){
+            this.name = name;
+            return this;
+        }
+
+        public UserBuilder setEmail(String email){
+            this.email = email;
+            return this;
+        }
+
+        public UserBuilder setBirthYear(int birthYear){
+            this.birthYear = birthYear;
+            return this;
+        }
+
+        public User build(){
+            return new User(this);
+        }
+
     }
 }
