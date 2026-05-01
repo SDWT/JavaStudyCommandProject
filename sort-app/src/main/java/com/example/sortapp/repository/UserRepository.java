@@ -4,7 +4,7 @@ import java.util.List;
 
 // TODO
 // Переименовать класс в соответсвии с класом модели
-public class StudentRepository {
+public class UserRepository {
 
     public List<Object> readFromFile(String path) {
         // TODO
