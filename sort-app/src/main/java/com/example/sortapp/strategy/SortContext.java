@@ -11,9 +11,9 @@ public class SortContext<T> {
         this.strategy = strategy;
     }
 
-    public void execute(List<T> list, Comparator<T> comparator) {
+    public void sort(List<T> list, Comparator<T> comparator) {
         if (strategy == null) {
-            throw new IllegalStateException("Strategy not set");
+            throw new IllegalStateException("Strategy is not set");
         }
         strategy.sort(list, comparator);
     }
