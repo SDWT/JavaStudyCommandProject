@@ -2,6 +2,8 @@ package com.example.sortapp.domain.model;
 
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class User implements Comparable<User> {
@@ -12,18 +14,8 @@ public class User implements Comparable<User> {
 
     private User(Builder userBuilder) {
         this.name = validateAndNormalizeName(userBuilder.name);
-        this.email = Objects.requireNonNull(userBuilder.email, "email не может быть пустым")
-                .trim();
-
-        if (userBuilder.birthYear < 0) {
-            throw new IllegalArgumentException("Год не может быть отрицательным");
-        }
-        if (userBuilder.birthYear > java.time.Year.now()
-                .getValue()) {
-            throw new IllegalArgumentException("Год превышает текущий");
-        }
-        this.birthYear = userBuilder.birthYear;
-
+        this.email = validateAndNormalizeEmail(userBuilder.email);
+        this.birthYear = validateBirthYear(userBuilder.birthYear);
     }
 
     private String validateAndNormalizeName(String name) {
@@ -33,7 +25,37 @@ public class User implements Comparable<User> {
             throw new IllegalArgumentException("Поле name должно состоять минимум из 2х символов");
         }
 
+        Pattern namePattern = Pattern.compile("^[А-ЯA-Zа-яa-z][А-ЯA-Zа-яa-z\\s'-]+$");
+        Matcher nameMatcher = namePattern.matcher(validatedName);
+        if(!nameMatcher.matches()){
+            throw new IllegalArgumentException("Поле name не может содержать цифры и спец символы");
+        }
+
         return validatedName;
+    }
+
+    private String validateAndNormalizeEmail(String email) {
+        String validatedEmail = Objects.requireNonNull(email, "email не может быть пустым")
+                .trim();
+        Pattern emailPattern = Pattern.compile("[A-Za-z0-9._-]+@[a-z]+.[A-Za-z]{2,}$");
+        Matcher emailMatcher = emailPattern.matcher(validatedEmail);
+        if(!emailMatcher.matches()){
+            throw new IllegalArgumentException("Некорректная почта");
+        }
+        return validatedEmail;
+    }
+
+    private int validateBirthYear(int birthYear) {
+        int minYear = 1900;
+        int currentYear = java.time.Year.now()
+                .getValue();
+        if (birthYear < 0) {
+            throw new IllegalArgumentException("Год не может быть отрицательным");
+        }
+        if (birthYear < minYear || birthYear > currentYear ) {
+            throw new IllegalArgumentException("Год рождения: 1900–" + currentYear);
+        }
+        return birthYear;
     }
 
     public String getName() {
