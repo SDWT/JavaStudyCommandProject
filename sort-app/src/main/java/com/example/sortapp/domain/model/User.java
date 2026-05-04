@@ -10,19 +10,19 @@ public class User implements Comparable<User> {
     private final int birthYear;
 
 
-    private User(Builder userBuilder) {
-        this.name = validateAndNormalizeName(userBuilder.name);
-        this.email = Objects.requireNonNull(userBuilder.email, "email не может быть пустым")
+    private User(Builder builder) {
+        this.name = validateAndNormalizeName(builder.name);
+        this.email = Objects.requireNonNull(builder.email, "email не может быть пустым")
                 .trim();
 
-        if (userBuilder.birthYear < 0) {
+        if (builder.birthYear < 0) {
             throw new IllegalArgumentException("Год не может быть отрицательным");
         }
-        if (userBuilder.birthYear > java.time.Year.now()
+        if (builder.birthYear > java.time.Year.now()
                 .getValue()) {
             throw new IllegalArgumentException("Год превышает текущий");
         }
-        this.birthYear = userBuilder.birthYear;
+        this.birthYear = builder.birthYear;
 
     }
 
