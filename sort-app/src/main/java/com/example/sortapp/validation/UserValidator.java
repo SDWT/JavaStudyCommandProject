@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 
 public class UserValidator {
-    private static final Pattern  NAME_PATTERN = Pattern.compile("^[А-ЯA-Zа-яa-z][А-ЯA-Zа-яa-z\\s'-]+$");
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[А-ЯA-Zа-яa-z][А-ЯA-Zа-яa-z\\s'-]+$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("[A-Za-z0-9._-]+@[a-z]+\\.[A-Za-z]{2,}$");
 
     public static String validateAndNormalizeEmail(String email) {
