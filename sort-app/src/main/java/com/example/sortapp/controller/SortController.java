@@ -16,14 +16,14 @@ public class SortController {
     private final UserRepository repository = new UserRepository();
 
     public List<User> sort(
-            List<User> data,
+            List<User> list,
             int strategyChoice,
             int comparatorChoice
     ) {
         SortStrategy<User> strategy = resolveStrategy(strategyChoice);
         Comparator<User> comparator = resolveComparator(comparatorChoice);
 
-        return service.sort(data, strategy, comparator);
+        return service.sort(list, strategy, comparator);
     }
 
     public List<User> loadFromFile(String path) {
