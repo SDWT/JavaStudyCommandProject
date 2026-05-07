@@ -15,11 +15,30 @@ public class SortController {
     private final SortService service = new SortService();
     private final UserRepository repository = new UserRepository();
 
+    public void addUser(User user) {
+        repository.add(user);
+    }
+
+    public void addUsers(List<User> users) {
+        repository.addAll(users);
+    }
+
+    public List<User> getAllUsers() {
+        return repository.getAll();
+    }
+
+    public void clearUsers() {
+        repository.clear();
+    }
+
+    public int getUsersCount() {
+        return repository.size();
+    }
+
     public List<User> sort(
             List<User> list,
             int strategyChoice,
-            int comparatorChoice
-    ) {
+            int comparatorChoice) {
         SortStrategy<User> strategy = resolveStrategy(strategyChoice);
         Comparator<User> comparator = resolveComparator(comparatorChoice);
 
