@@ -11,14 +11,13 @@ public class MergeSorter<T> implements SortStrategy<T> {
     @Override
     public void sort(List<T> list, Comparator<T> comparator) {
         int size = list.size();
-        var listA = list.subList(0, size / 2 - 1);
-        if (listA.size() > 1) {
-            sort(listA, comparator);
+        if (size <= 1) {
+            return;
         }
+        var listA = list.subList(0, size / 2);
         var listB = list.subList(size / 2, size);
-        if (listB.size() > 1) {
-            sort(listB, comparator);
-        }
+        sort(listA, comparator);
+        sort(listB, comparator);
         list = merge(listA, listB, comparator);
     }
 
