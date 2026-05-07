@@ -6,7 +6,8 @@ import java.util.regex.Pattern;
 
 
 public class UserValidator {
-    private static final Pattern NAME_PATTERN = Pattern.compile("^[А-ЯA-Zа-яa-z][А-ЯA-Zа-яa-z\\s'-]+$");
+    final static int MIN_YEAR = 1900;
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[А-ЯA-Zа-яa-z]+([\\s'-][А-Яа-яA-Za-z]+)*$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("[A-Za-z0-9._-]+@[a-z]+\\.[A-Za-z]{2,}$");
 
     public static String validateAndNormalizeEmail(String email) {
@@ -35,14 +36,10 @@ public class UserValidator {
     }
 
     public static int validateBirthYear(int birthYear) {
-        int minYear = 1900;
         int currentYear = java.time.Year.now()
                 .getValue();
-        if (birthYear < 0) {
-            throw new IllegalArgumentException("Год не может быть отрицательным");
-        }
-        if (birthYear < minYear || birthYear > currentYear) {
-            throw new IllegalArgumentException("Год рождения: 1900–" + currentYear);
+        if (birthYear < MIN_YEAR || birthYear > currentYear) {
+            throw new IllegalArgumentException("Год рождения: " + MIN_YEAR + " " + currentYear);
         }
         return birthYear;
     }
