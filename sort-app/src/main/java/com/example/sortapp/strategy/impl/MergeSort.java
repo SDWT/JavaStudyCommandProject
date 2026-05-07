@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.example.sortapp.strategy.SortStrategy;
 
-public class MergeSorter<T> implements SortStrategy<T> {
+public class MergeSort<T> implements SortStrategy<T> {
 
     @Override
     public void sort(List<T> list, Comparator<T> comparator) {
