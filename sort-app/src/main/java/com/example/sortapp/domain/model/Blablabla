@@ -8,12 +8,11 @@ public class Console {
 
     private final List<User> users = new ArrayList<>();
 
-    public static void main(String[] args) {
-        start();
+    public void start();
     }
 
     // === ГЛАВНОЕ МЕНЮ ===
-    public static void start() {
+    public void start() {
         while (true) {
             System.out.println("""
                     
@@ -38,7 +37,7 @@ public class Console {
     }
 
     // === ПОДМЕНЮ ===
-    public static void userMenu() {
+    public void userMenu() {
         while (true) {
             System.out.println("""
                     
@@ -62,7 +61,7 @@ public class Console {
     }
 
     // === ВВОД ОДНОГО ПОЛЬЗОВАТЕЛЯ ===
-    public static void manualInputSingle() {
+    public void manualInputSingle() {
         try {
             System.out.println("Введите имя:");
             String name = scanner.nextLine();
@@ -87,7 +86,7 @@ public class Console {
     }
 
     // === ВВОД НЕСКОЛЬКИХ ПОЛЬЗОВАТЕЛЕЙ ===
-    public static void manualInputMultiple() {
+    public void manualInputMultiple() {
         while (true) {
             manualInputSingle();
 
@@ -101,7 +100,7 @@ public class Console {
     }
 
     // === ВЫВОД ПОЛЬЗОВАТЕЛЕЙ ===
-    public static void printUsers() {
+    public void printUsers() {
         if (users.isEmpty()) {
             System.out.println("Список пуст.");
             return;
@@ -113,7 +112,7 @@ public class Console {
         }
     }
 
-    public static int readInt() {
+    public int readInt() {
         while (true) {
             try {
                 return Integer.parseInt(scanner.nextLine());
