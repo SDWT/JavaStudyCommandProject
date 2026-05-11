@@ -1,27 +1,35 @@
 package com.example.sortapp.service;
 
-import java.util.Comparator;
-import java.util.List;
-
-import com.example.sortapp.domain.model.User;
 import com.example.sortapp.strategy.SortStrategy;
 
-public class SortService {
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
-    public void handleRandom() {
-        System.out.println("Random input not implemented yet");
+public class SortService<T> {
+
+    private SortStrategy<T> strategy;
+
+    public void setStrategy(SortStrategy<T> strategy) {
+        this.strategy = Objects.requireNonNull(strategy, 
+            "Strategy must not be null");
     }
 
-    public void handleFile() {
-        System.out.println("File input not implemented yet");
-    }
+    public List<T> sort(List<T> list, Comparator<T> comparator) {
 
-    public void handleManual() {
-        System.out.println("Manual input not implemented yet");
-    }
+        Objects.requireNonNull(list, "Data must not be null");
 
-    public List<User> sort(List<User> data, SortStrategy<User> strategy, Comparator<User> comparator) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'sort'");
+        Objects.requireNonNull(comparator, "Comparator must not be null");
+
+        if (strategy == null) {
+            throw new IllegalStateException("Strategy is not set");
+        }
+
+        List<T> sortedList = new ArrayList<>(list);
+
+        strategy.sort(sortedList, comparator);
+
+        return sortedList;
     }
 }
