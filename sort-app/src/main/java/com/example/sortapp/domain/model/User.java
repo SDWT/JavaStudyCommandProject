@@ -7,6 +7,7 @@ import java.util.Objects;
 
 
 public class User implements Comparable<User> {
+
     private final String name;
     private final String email;
     private final int birthYear;
@@ -66,15 +67,15 @@ public class User implements Comparable<User> {
         private int birthYear;
 
 
-        public Builder(String email) {
-            this.email = email;
-        }
-
         public Builder name(String name) {
             this.name = name;
             return this;
         }
 
+        public Builder email(String email){
+            this.email = email;
+            return this;
+        }
 
         public Builder birthYear(int birthYear) {
             this.birthYear = birthYear;
