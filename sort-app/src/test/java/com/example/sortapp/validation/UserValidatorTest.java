@@ -15,7 +15,10 @@ class UserValidatorTest {
             "'  Test@mail.com  ', test@mail.com",
             "' test@gmail.com', test@gmail.com",
             "'test-test@mail.com ', test-test@mail.com",
-            "1234t@yandex.ru, 1234t@yandex.ru"
+            "1234t@yandex.ru, 1234t@yandex.ru",
+            "test.user@gmail.com, test.user@gmail.com",
+            "user123@mail.co.uk, user123@mail.co.uk",
+            "USER@GMAIL.COM, user@gmail.com"
     })
     void shouldReturnValidEmail(String input, String expected) {
         String result = UserValidator.validateAndNormalizeEmail(input);

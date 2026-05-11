@@ -5,13 +5,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class UserValidator {
-    final static int MIN_YEAR = 1900;
+public final class UserValidator {
+    private static final int MIN_YEAR = 1900;
     private static final Pattern NAME_PATTERN = Pattern.compile("^[А-ЯA-Zа-яa-z]+([\\s'-][А-Яа-яA-Za-z]+)*$");
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("[A-Za-z0-9._-]+@[a-z]+\\.[A-Za-z]{2,}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._-]+@[A-Za-z]+\\.[A-Za-z.]+$");
+
+    private  UserValidator(){
+
+    }
 
     public static String validateAndNormalizeEmail(String email) {
-        String validatedEmail = Objects.requireNonNull(email, "email не может быть пустым")
+        String validatedEmail = Objects.requireNonNull(email, "email не может быть null")
                 .trim();
         Matcher emailMatcher = EMAIL_PATTERN.matcher(validatedEmail);
         if (!emailMatcher.matches()) {
@@ -39,7 +43,8 @@ public class UserValidator {
         int currentYear = java.time.Year.now()
                 .getValue();
         if (birthYear < MIN_YEAR || birthYear > currentYear) {
-            throw new IllegalArgumentException("Год рождения: " + MIN_YEAR + " " + currentYear);
+            throw new IllegalArgumentException("Некорректный год рождения: " + birthYear +
+                    ". Допустимый диапазон: от " + MIN_YEAR + " до " + currentYear + " включительно");
         }
         return birthYear;
     }
