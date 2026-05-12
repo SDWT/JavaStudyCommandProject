@@ -4,15 +4,15 @@ import com.example.sortapp.domain.model.User;
 import com.example.sortapp.repository.UserRepository;
 import com.example.sortapp.service.SortService;
 import com.example.sortapp.strategy.SortStrategy;
-import com.example.sortapp.strategy.impl.MergeSort;
 import com.example.sortapp.strategy.impl.BubbleSort;
+import com.example.sortapp.strategy.impl.MergeSort;
 
 import java.util.Comparator;
 import java.util.List;
 
 public class SortController {
 
-    private final SortService service = new SortService();
+    private final SortService<User> sortService = new SortService<>();
     private final UserRepository repository = new UserRepository();
 
     public void addUser(User user) {
@@ -39,10 +39,14 @@ public class SortController {
             List<User> list,
             int strategyChoice,
             int comparatorChoice) {
+
         SortStrategy<User> strategy = resolveStrategy(strategyChoice);
+
         Comparator<User> comparator = resolveComparator(comparatorChoice);
 
-        return service.sort(list, strategy, comparator);
+        sortService.setStrategy(strategy);
+
+        return sortService.sort(list, comparator);
     }
 
     public List<User> loadFromFile(String path) {
@@ -55,8 +59,8 @@ public class SortController {
 
     private SortStrategy<User> resolveStrategy(int choice) {
         return switch (choice) {
-            case 1 -> new BubbleSort<User>();
-            case 2 -> new MergeSort<User>();
+            case 1 -> new BubbleSort<>();
+            case 2 -> new MergeSort<>();
             default -> throw new IllegalArgumentException("Invalid strategy");
         };
     }
