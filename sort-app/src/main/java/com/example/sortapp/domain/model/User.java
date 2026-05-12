@@ -1,39 +1,22 @@
 package com.example.sortapp.domain.model;
 
+import com.example.sortapp.validation.UserValidator;
+
 import java.util.Comparator;
 import java.util.Objects;
 
 
 public class User implements Comparable<User> {
+
     private final String name;
     private final String email;
     private final int birthYear;
 
 
-    private User(Builder builder) {
-        this.name = validateAndNormalizeName(builder.name);
-        this.email = Objects.requireNonNull(builder.email, "email не может быть пустым")
-                .trim();
-
-        if (builder.birthYear < 0) {
-            throw new IllegalArgumentException("Год не может быть отрицательным");
-        }
-        if (builder.birthYear > java.time.Year.now()
-                .getValue()) {
-            throw new IllegalArgumentException("Год превышает текущий");
-        }
-        this.birthYear = builder.birthYear;
-
-    }
-
-    private String validateAndNormalizeName(String name) {
-        String validatedName = Objects.requireNonNull(name, "name не может быть null")
-                .trim();
-        if (validatedName.length() < 2) {
-            throw new IllegalArgumentException("Поле name должно состоять минимум из 2х символов");
-        }
-
-        return validatedName;
+    private User(Builder userBuilder) {
+        this.name = UserValidator.validateAndNormalizeName(userBuilder.name);
+        this.email = UserValidator.validateAndNormalizeEmail(userBuilder.email);
+        this.birthYear = UserValidator.validateBirthYear(userBuilder.birthYear);
     }
 
     public String getName() {
@@ -83,12 +66,13 @@ public class User implements Comparable<User> {
         private String email;
         private int birthYear;
 
+
         public Builder name(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder email(String email) {
+        public Builder email(String email){
             this.email = email;
             return this;
         }

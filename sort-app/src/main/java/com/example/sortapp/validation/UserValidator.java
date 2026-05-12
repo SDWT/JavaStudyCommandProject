@@ -1,11 +1,51 @@
 package com.example.sortapp.validation;
 
-// TODO
-// Переименовать класс в соответсвии с класом модели
-public class UserValidator {
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-    public static boolean isValid(Object s) {
-        // TODO
-        return true;
+
+public final class UserValidator {
+    private static final int MIN_YEAR = 1900;
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[А-ЯA-Zа-яa-z]+([\\s'-][А-Яа-яA-Za-z]+)*$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._-]+@[A-Za-z]+\\.[A-Za-z.]+$");
+
+    private  UserValidator(){
+
+    }
+
+    public static String validateAndNormalizeEmail(String email) {
+        String validatedEmail = Objects.requireNonNull(email, "email не может быть null")
+                .trim();
+        Matcher emailMatcher = EMAIL_PATTERN.matcher(validatedEmail);
+        if (!emailMatcher.matches()) {
+            throw new IllegalArgumentException("Некорректная почта");
+        }
+        return validatedEmail.toLowerCase();
+    }
+
+    public static String validateAndNormalizeName(String name) {
+        String validatedName = Objects.requireNonNull(name, "name не может быть null")
+                .trim();
+        if (validatedName.length() < 2) {
+            throw new IllegalArgumentException("Поле name должно состоять минимум из 2х символов");
+        }
+
+        Matcher nameMatcher = NAME_PATTERN.matcher(validatedName);
+        if (!nameMatcher.matches()) {
+            throw new IllegalArgumentException("Поле name не может содержать цифры и спец символы");
+        }
+
+        return validatedName;
+    }
+
+    public static int validateBirthYear(int birthYear) {
+        int currentYear = java.time.Year.now()
+                .getValue();
+        if (birthYear < MIN_YEAR || birthYear > currentYear) {
+            throw new IllegalArgumentException("Некорректный год рождения: " + birthYear +
+                    ". Допустимый диапазон: от " + MIN_YEAR + " до " + currentYear + " включительно");
+        }
+        return birthYear;
     }
 }
