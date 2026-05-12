@@ -22,14 +22,13 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Console {
-
+public class ConsoleUI {
+    private final SortController controller = new SortController();
     private final Scanner scanner = new Scanner(System.in);
 
-    private final List<User> users = new ArrayList<>();
+    private final UserController controller = new UserController();
 
-    public void start();
-    }
+    
 
     // === ГЛАВНОЕ МЕНЮ ===
     public void start() {
@@ -96,7 +95,7 @@ public class Console {
                     .name(name)
                     .birthYear(birthYear)
                     .build();
-            users.add(user);
+            controller.addUser(user);
 
             System.out.println("Пользователь добавлен!");
 
@@ -127,7 +126,7 @@ public class Console {
         }
 
         int i = 1;
-        for (User user : users) {
+        for (User user : controller.getAllUsers()) {
             System.out.println(i++ + ". " + user);
         }
     }
