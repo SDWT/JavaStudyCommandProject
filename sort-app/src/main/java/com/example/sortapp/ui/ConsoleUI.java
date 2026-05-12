@@ -1,36 +1,20 @@
 package com.example.sortapp.ui;
 
-public class ConsoleUI {
-
-    private final SortController controller = new SortController();
-
-    public void start() {
-        
-    }
-
-}
-
-
-
-
-
 import java.util.Scanner;
 import java.util.List;
-import java.util.ArrayList;
+
+import com.example.sortapp.controller.SortController;
+import com.example.sortapp.domain.model.User;
 
 public class ConsoleUI {
     private final SortController controller = new SortController();
     private final Scanner scanner = new Scanner(System.in);
 
-    private final UserController controller = new UserController();
-
-    
-
     // === ГЛАВНОЕ МЕНЮ ===
     public void start() {
         while (true) {
             System.out.println("""
-                    
+
                     === ГЛАВНОЕ МЕНЮ ===
                     1. Работа с пользователями
                     2. Показать пользователей
@@ -55,7 +39,7 @@ public class ConsoleUI {
     public void userMenu() {
         while (true) {
             System.out.println("""
-                    
+
                     === МЕНЮ ПОЛЬЗОВАТЕЛЕЙ ===
                     1. Ввести одного пользователя
                     2. Ввести несколько пользователей
@@ -89,6 +73,7 @@ public class ConsoleUI {
 
             User user = new User.Builder()
                     .name(name)
+                    .email(email)
                     .birthYear(birthYear)
                     .build();
             controller.addUser(user);
@@ -116,13 +101,14 @@ public class ConsoleUI {
 
     // === ВЫВОД ПОЛЬЗОВАТЕЛЕЙ ===
     public void printUsers() {
+        List<User> users = controller.getAllUsers();
         if (users.isEmpty()) {
             System.out.println("Список пуст.");
             return;
         }
 
         int i = 1;
-        for (User user : controller.getAllUsers()) {
+        for (User user : users) {
             System.out.println(i++ + ". " + user);
         }
     }
