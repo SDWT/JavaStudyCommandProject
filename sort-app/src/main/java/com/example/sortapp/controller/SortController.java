@@ -67,9 +67,9 @@ public class SortController {
 
     private Comparator<User> resolveComparator(int choice) {
         return switch (choice) {
-            case 1 -> Comparator.comparing(User::getName);
-            case 2 -> Comparator.comparing(User::getEmail);
-            case 3 -> Comparator.comparingInt(User::getBirthYear);
+            case 1 -> User.BY_NAME;
+            case 2 -> User.BY_EMAIL;
+            case 3 -> User.BY_BIRTH_YEAR;
             default -> throw new IllegalArgumentException("Invalid comparator");
         };
     }

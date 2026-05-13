@@ -5,13 +5,18 @@ import com.example.sortapp.validation.UserValidator;
 import java.util.Comparator;
 import java.util.Objects;
 
-
 public class User implements Comparable<User> {
+
+    public static final Comparator<User> BY_NAME = Comparator.comparing(User::getName);
+    public static final Comparator<User> BY_EMAIL = Comparator.comparing(User::getEmail);
+    public static final Comparator<User> BY_BIRTH_YEAR = Comparator.comparingInt(User::getBirthYear);
+    public static final Comparator<User> BY_NAME_EMAIL_BIRTH_YEAR = Comparator.comparing(User::getName)
+            .thenComparing(User::getEmail)
+            .thenComparingInt(User::getBirthYear);
 
     private final String name;
     private final String email;
     private final int birthYear;
-
 
     private User(Builder userBuilder) {
         this.name = UserValidator.validateAndNormalizeName(userBuilder.name);
@@ -33,7 +38,11 @@ public class User implements Comparable<User> {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
         User user = (User) o;
         return birthYear == user.birthYear && Objects.equals(name, user.name) && Objects.equals(email, user.email);
     }
@@ -54,25 +63,21 @@ public class User implements Comparable<User> {
 
     @Override
     public int compareTo(User other) {
-        return Comparator.comparing(User::getName)
-                .thenComparing(User::getEmail)
-                .thenComparingInt(User::getBirthYear)
+        return BY_NAME_EMAIL_BIRTH_YEAR
                 .compare(this, other);
     }
-
 
     public static class Builder {
         private String name;
         private String email;
         private int birthYear;
 
-
         public Builder name(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder email(String email){
+        public Builder email(String email) {
             this.email = email;
             return this;
         }
