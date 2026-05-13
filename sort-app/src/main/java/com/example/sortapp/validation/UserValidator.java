@@ -1,51 +1,53 @@
 package com.example.sortapp.validation;
 
+import java.time.Year;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 public final class UserValidator {
     private static final int MIN_YEAR = 1900;
-    private static final Pattern NAME_PATTERN = Pattern.compile("^[А-ЯA-Zа-яa-z]+([\\s'-][А-Яа-яA-Za-z]+)*$");
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._-]+@[A-Za-z]+\\.[A-Za-z.]+$");
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[А-ЯA-Zа-яa-z]+([\\s'-][А-ЯA-Za-zа-я]+)*$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    private  UserValidator(){
-
+    private UserValidator() {
     }
 
     public static String validateAndNormalizeEmail(String email) {
-        String validatedEmail = Objects.requireNonNull(email, "email не может быть null")
-                .trim();
-        Matcher emailMatcher = EMAIL_PATTERN.matcher(validatedEmail);
-        if (!emailMatcher.matches()) {
+
+        String normalized = Objects.requireNonNull(email, "email не может быть null")
+                .trim()
+                .toLowerCase();
+
+        if (normalized.isBlank())
+            throw new IllegalArgumentException("Email не может быть пустым");
+
+        if (!EMAIL_PATTERN.matcher(normalized).matches())
             throw new IllegalArgumentException("Некорректная почта");
-        }
-        return validatedEmail.toLowerCase();
+
+        return normalized;
     }
 
     public static String validateAndNormalizeName(String name) {
-        String validatedName = Objects.requireNonNull(name, "name не может быть null")
+        String normalized = Objects.requireNonNull(name, "name не может быть null")
                 .trim();
-        if (validatedName.length() < 2) {
-            throw new IllegalArgumentException("Поле name должно состоять минимум из 2х символов");
-        }
 
-        Matcher nameMatcher = NAME_PATTERN.matcher(validatedName);
-        if (!nameMatcher.matches()) {
-            throw new IllegalArgumentException("Поле name не может содержать цифры и спец символы");
-        }
+        if (normalized.length() < 2)
+            throw new IllegalArgumentException("Name too short");
 
-        return validatedName;
+        if (!NAME_PATTERN.matcher(normalized).matches())
+            throw new IllegalArgumentException("Invalid name format");
+
+        return normalized;
     }
 
     public static int validateBirthYear(int birthYear) {
-        int currentYear = java.time.Year.now()
-                .getValue();
-        if (birthYear < MIN_YEAR || birthYear > currentYear) {
+
+        int currentYear = Year.now().getValue();
+
+        if (birthYear < MIN_YEAR || birthYear > currentYear)
             throw new IllegalArgumentException("Некорректный год рождения: " + birthYear +
                     ". Допустимый диапазон: от " + MIN_YEAR + " до " + currentYear + " включительно");
-        }
+
         return birthYear;
     }
 }

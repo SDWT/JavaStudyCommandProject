@@ -1,4 +1,4 @@
-package com.example.sortapp.list;
+package com.example.sortapp.collection;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -20,22 +20,38 @@ public class CustomList<T> implements Iterable<T> {
     }
 
     public void add(T element) {
-        if (size == elements.length) {
-            increaseCapacity();
-        }
+        ensureCapacity();
         elements[size++] = element;
     }
 
+    public void add(int index, T element) {
+
+        checkIndexForAdd(index);
+
+        ensureCapacity();
+
+        for (int i = size; i > index; i--)
+            elements[i] = elements[i - 1];
+
+        elements[index] = element;
+        size++;
+    }
+
+    @SuppressWarnings("unchecked")
     public T get(int index) {
         checkIndex(index);
         return (T) elements[index];
     }
 
-    public void set(int index, T element) {
+    @SuppressWarnings("unchecked")
+    public T set(int index, T element) {
         checkIndex(index);
+        T oldValue = (T) elements[index];
         elements[index] = element;
+        return oldValue;
     }
 
+    @SuppressWarnings("unchecked")
     public T remove(int index) {
         checkIndex(index);
         T removedElement = (T) elements[index];
@@ -47,8 +63,34 @@ public class CustomList<T> implements Iterable<T> {
         return removedElement;
     }
 
+    public boolean remove(T element) {
+        int index = indexOf(element);
+        if (index == -1)
+            return false;
+        remove(index);
+        return true;
+    }
+
+    public int indexOf(T element) {
+        for (int i = 0; i < size; i++)
+            if (Objects.equals(elements[i], element))
+                return i;
+        return -1;
+    }
+
+    public int lastIndexOf(T element) {
+        for (int i = size - 1; i >= 0; i--)
+            if (Objects.equals(elements[i], element))
+                return i;
+        return -1;
+    }
+
     public int size() {
         return size;
+    }
+
+    public boolean isEmpty() {
+        return size == 0;
     }
 
     public void clear() {
@@ -58,16 +100,13 @@ public class CustomList<T> implements Iterable<T> {
         size = 0;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
+    private void ensureCapacity() {
+        if (size < elements.length)
+            return;
 
-    private void increaseCapacity() {
         int newCapacity = Math.max(1, elements.length * 2);
         Object[] newArray = new Object[newCapacity];
         System.arraycopy(elements, 0, newArray, 0, elements.length);
-        // for (int i = 0; i < elements.length; i++) {
-        // newArray[i] = elements[i]; }
         elements = newArray;
     }
 
@@ -77,7 +116,13 @@ public class CustomList<T> implements Iterable<T> {
         }
     }
 
+    private void checkIndexForAdd(int index) {
+        if (index < 0 || index > size)
+            throw new IndexOutOfBoundsException("Invalid index: " + index);
+    }
+
     @Override
+    @SuppressWarnings("unchecked")
     public Iterator<T> iterator() {
         return new Iterator<T>() {
             private int currentIndex = 0;
@@ -99,8 +144,7 @@ public class CustomList<T> implements Iterable<T> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
+        StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < size; i++) {
             sb.append(elements[i]);
             if (i < size - 1) {
@@ -110,13 +154,8 @@ public class CustomList<T> implements Iterable<T> {
         sb.append("]");
         return sb.toString();
     }
-
+    
     public boolean contains(T element) {
-        for (int i = 0; i < size; i++) {
-            if (Objects.equals(elements[i], element)) {
-                return true;
-            }
-        }
-        return false;
+        return indexOf(element) != -1;
     }
 }

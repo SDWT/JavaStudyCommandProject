@@ -1,10 +1,13 @@
 package com.example.sortapp.ui;
 
 import java.util.Scanner;
+import java.util.function.Function;
 import java.util.List;
 
 import com.example.sortapp.controller.SortController;
 import com.example.sortapp.domain.model.User;
+import com.example.sortapp.util.UserGenerator;
+import com.example.sortapp.validation.UserValidator;
 
 public class ConsoleUI {
     private final SortController controller = new SortController();
@@ -18,14 +21,14 @@ public class ConsoleUI {
                     === ГЛАВНОЕ МЕНЮ ===
                     1. Работа с пользователями
                     2. Показать пользователей
+                    3. Сортировать пользователей
                     0. Выход
                     """);
 
-            int choice = readInt();
-
-            switch (choice) {
+            switch (readInt()) {
                 case 1 -> userMenu();
-                case 2 -> printUsers();
+                case 2 -> printUsers(controller.getAllUsers());
+                case 3 -> sortMenu();
                 case 0 -> {
                     System.out.println("Выход из программы...");
                     return; // выход из программы
@@ -35,73 +38,99 @@ public class ConsoleUI {
         }
     }
 
-    // === ПОДМЕНЮ ===
-    public void userMenu() {
-        while (true) {
-            System.out.println("""
+    private void userMenu() {
+        System.out.println("""
 
-                    === МЕНЮ ПОЛЬЗОВАТЕЛЕЙ ===
-                    1. Ввести одного пользователя
-                    2. Ввести несколько пользователей
-                    0. Назад
-                    """);
+                === МЕНЮ ПОЛЬЗОВАТЕЛЕЙ ===
+                1. Сгенерировать пользователей
+                2. Загрузка из файла
+                3. Сохранение в файл
+                4. Ввести одного пользователя
+                5. Ввести несколько пользователей
+                9. Отчистить список
+                0. Назад
+                """);
 
-            int choice = readInt();
-
-            switch (choice) {
-                case 1 -> manualInputSingle();
-                case 2 -> manualInputMultiple();
-                case 0 -> {
-                    return;
-                }
-                default -> System.out.println("Неверный выбор!");
+        switch (readInt()) {
+            case 1 -> generate();
+            case 2 -> load();
+            case 3 -> save();
+            case 4 -> manualInputSingle();
+            case 5 -> manualInputMultiple();
+            case 9 -> controller.clearUsers();
+            case 0 -> {
+                return;
             }
+            default -> System.out.println("Неверный выбор!");
         }
     }
 
-    // === ВВОД ОДНОГО ПОЛЬЗОВАТЕЛЯ ===
-    public void manualInputSingle() {
+    private void sortMenu() {
+
+        System.out.println("""
+                === МЕНЮ СОРТИРОВКИ ===
+                Стратегия:
+                1. Сортировка пузырьком
+                2. Сортировка слиянием
+                3. Сортировка по чётным значениям
+                """);
+        int strategy = readInt();
+
+        System.out.println("""
+                Способ сравнения:
+                1. Имя
+                2. Электронная почта
+                3. Год рождения
+                4. По трём полям Имя, затем email, затем год рождения
+                """);
+        int comparator = readInt();
+
         try {
-            System.out.println("Введите имя:");
-            String name = scanner.nextLine();
+            List<User> sorted = controller
+                    .sort(controller.getAllUsers(), strategy, comparator);
 
-            System.out.println("Введите email:");
-            String email = scanner.nextLine();
-
-            System.out.println("Введите год рождения:");
-            int birthYear = Integer.parseInt(scanner.nextLine());
-
-            User user = new User.Builder()
-                    .name(name)
-                    .email(email)
-                    .birthYear(birthYear)
-                    .build();
-            controller.addUser(user);
-
-            System.out.println("Пользователь добавлен!");
-
-        } catch (NumberFormatException e) {
-            System.out.println("Ошибка ввода. Попробуйте снова.");
+            System.out.println("Отсортировано:");
+            printUsers(sorted);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Введена неверная стратегия или способ сравнения.");
         }
+    }
+
+    private void manualInputSingle() {
+
+        System.out.println("Введите имя:");
+        String name = readStringProperty(UserValidator::validateAndNormalizeName);
+
+        System.out.println("Введите email:");
+        String email = readStringProperty(UserValidator::validateAndNormalizeEmail);
+
+        System.out.println("Введите год рождения:");
+        int birthYear = readInt(UserValidator::validateBirthYear);
+
+        User user = new User.Builder()
+                .name(name)
+                .email(email)
+                .birthYear(birthYear)
+                .build();
+        controller.addUser(user);
+
+        System.out.println("Пользователь добавлен!");
     }
 
     // === ВВОД НЕСКОЛЬКИХ ПОЛЬЗОВАТЕЛЕЙ ===
-    public void manualInputMultiple() {
+    private void manualInputMultiple() {
         while (true) {
             manualInputSingle();
 
             System.out.println("Добавить ещё? (y/n)");
-            String answer = scanner.nextLine();
 
-            if (!answer.equalsIgnoreCase("y")) {
+            if (!scanner.nextLine().equalsIgnoreCase("y")) {
                 break;
             }
         }
     }
 
-    // === ВЫВОД ПОЛЬЗОВАТЕЛЕЙ ===
-    public void printUsers() {
-        List<User> users = controller.getAllUsers();
+    private void printUsers(List<User> users) {
         if (users.isEmpty()) {
             System.out.println("Список пуст.");
             return;
@@ -109,16 +138,66 @@ public class ConsoleUI {
 
         int i = 1;
         for (User user : users) {
-            System.out.println(i++ + ". " + user);
+            System.out.println((i++) + ". " + user);
         }
     }
 
-    public int readInt() {
+    private void load() {
+
+        System.out.println("Путь к файлу:");
+
+        List<User> users = controller.loadFromFile(scanner.nextLine());
+
+        users.forEach(controller::addUser);
+    }
+
+    private void save() {
+
+        System.out.println("Путь к файлу:");
+
+        controller.saveToFile(
+                scanner.nextLine(),
+                controller.getAllUsers());
+    }
+
+    private void generate() {
+
+        System.out.println("Введте количество пользователей для генерации:");
+
+        List<User> users = UserGenerator.generate(readInt());
+
+        users.forEach(controller::addUser);
+    }
+
+    private int readInt() {
+
         while (true) {
             try {
                 return Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
+            } catch (Exception e) {
                 System.out.println("Введите число!");
+            }
+        }
+    }
+
+    private int readInt(Function<Integer, Integer> validateMethod) {
+
+        while (true) {
+            try {
+                return validateMethod.apply(readInt());
+            } catch (Exception e) {
+                System.out.println("Не прошло валидацию, введите другое значение! " + e.getMessage());
+            }
+        }
+    }
+
+    private String readStringProperty(Function<String, String> validateMethod) {
+
+        while (true) {
+            try {
+                return validateMethod.apply(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println("Не прошло валидацию, введите другое значение! " + e.getMessage());
             }
         }
     }
