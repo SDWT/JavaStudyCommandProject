@@ -1,28 +1,30 @@
 package com.example.sortapp.repository;
 
-import java.util.ArrayList;
-import java.io.EOFException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
-
 import com.example.sortapp.collection.CustomList;
 import com.example.sortapp.collection.CustomListAdapter;
 import com.example.sortapp.domain.model.User;
 
 public class UserRepository {
 
-    private final List<User> users = new CustomListAdapter<User>(new CustomList<User>());
+    private static final String DELIMITER = "\t";
+
+    private final List<User> users = new CustomListAdapter<>(new CustomList<>());
 
     public void add(User user) {
+        Objects.requireNonNull(user, "User must not be null");
         users.add(user);
     }
 
     public void addAll(List<User> users) {
+        Objects.requireNonNull(users, "Users must not be null");
         this.users.addAll(users);
     }
 
@@ -43,61 +45,64 @@ public class UserRepository {
     }
 
     public List<User> readFromFile(String filename) {
+        Objects.requireNonNull(filename, "Filename must not be null");
 
         Path path = Path.of(filename);
 
+        if (Files.notExists(path))
+            throw new IllegalArgumentException("File does not exist: " + filename);
+
         try {
             return Files.lines(path)
-                    .map(line -> {
-                        try {
-                            return userFromTSVString(line);
-                        } catch (EOFException e) {
-                            throw new RuntimeException("Invalid line: " + line, e);
-                        }
-                    })
-                    .collect(Collectors.toList());
+                    .filter(line -> !line.isBlank())
+                    .map(this::parseUser)
+                    .toList();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read users file", e);
+            throw new RuntimeException("Failed to read file: " + filename, e);
         }
     }
 
-    private static User userFromTSVString(String tsv) throws EOFException {
-        var userStrs = tsv.split("\t");
-        // name email birthYear
+    public void appendToFile(String filename, List<User> users) {
+        Objects.requireNonNull(filename, "Filename must not be null");
+        Objects.requireNonNull(users, "Users must not be null");
 
-        int birthYear = Integer.parseInt(userStrs[2]);
+        Path path = Path.of(filename);
+        List<String> lines = users.stream()
+                .map(this::toTsvString)
+                .collect(Collectors.toList());
 
-        return new User.Builder()
-                .name(userStrs[0])
-                .email(userStrs[1])
-                .birthYear(birthYear)
-                .build();
-    }
-
-    public void appendToFile(String path, List<User> users) {
-        Path filePath = Paths.get(path);
         try {
-            // Если файл не существует, создаем его с заголовками
-            if (Files.notExists(filePath)) {
-                //String header = "Name\tEmail\tBirthYear";
-                Files.writeString(filePath,"");
-            }
-
-            // Подготавливаем строки пользователей
-            List<String> lines = users.stream()
-                    .map(user -> String.format("%s\t%s\t%d",
-                            user.getName(),
-                            user.getEmail(),
-                            user.getBirthYear()))
-                    .collect(Collectors.toList());
-
-            // Дописываем данные в конец файла
-            Files.write(
-                    filePath,
-                    lines,
-                    StandardOpenOption.APPEND);
+            Files.write(path, lines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to write file: " + filename, e);
         }
+    }
+
+    private User parseUser(String line) {
+
+        String[] values = line.split(DELIMITER);
+        if (values.length != 3) {
+            throw new IllegalArgumentException("Invalid user format: " + line);
+        }
+
+        try {
+            return new User.Builder()
+                    .name(values[0])
+                    .email(values[1])
+                    .birthYear(Integer.parseInt(values[2]))
+                    .build();
+
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid birth year: " + line, e);
+        }
+    }
+
+    private String toTsvString(User user) {
+        return String.format("%s%s%s%s%d",
+                user.getName(),
+                DELIMITER,
+                user.getEmail(),
+                DELIMITER,
+                user.getBirthYear());
     }
 }

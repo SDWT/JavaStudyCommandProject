@@ -113,7 +113,7 @@ class UserRepositoryTest {
         @Test
         void shouldThrowExceptionForInvalidPath() {
 
-                assertThrows(RuntimeException.class,
+                assertThrows(IllegalArgumentException.class,
                         () -> repository.readFromFile("invalid/path/file.txt"));
         }
 
