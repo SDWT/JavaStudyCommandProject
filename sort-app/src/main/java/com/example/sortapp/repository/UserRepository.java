@@ -1,6 +1,7 @@
 package com.example.sortapp.repository;
 
 import java.util.ArrayList;
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,9 +42,36 @@ public class UserRepository {
         return users.isEmpty();
     }
 
-    public List<User> readFromFile(String path) {
-        // TODO
-        return null;
+    public List<User> readFromFile(String filename) {
+
+        Path path = Path.of(filename);
+
+        try {
+            return Files.lines(path)
+                    .map(line -> {
+                        try {
+                            return userFromTSVString(line);
+                        } catch (EOFException e) {
+                            throw new RuntimeException("Invalid line: " + line, e);
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read users file", e);
+        }
+    }
+
+    private static User userFromTSVString(String tsv) throws EOFException {
+        var userStrs = tsv.split("\t");
+        // name email birthYear
+
+        int birthYear = Integer.parseInt(userStrs[2]);
+
+        return new User.Builder()
+                .name(userStrs[0])
+                .email(userStrs[1])
+                .birthYear(birthYear)
+                .build();
     }
 
     public void appendToFile(String path, List<User> users) {
@@ -51,8 +79,8 @@ public class UserRepository {
         try {
             // Если файл не существует, создаем его с заголовками
             if (Files.notExists(filePath)) {
-                String header = "Name\tEmail\tBirthYear";
-                Files.writeString(filePath, header + System.lineSeparator());
+                //String header = "Name\tEmail\tBirthYear";
+                Files.writeString(filePath,"");
             }
 
             // Подготавливаем строки пользователей
