@@ -1,4 +1,4 @@
-package com.example.sortapp.list;
+package com.example.sortapp.collection;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
