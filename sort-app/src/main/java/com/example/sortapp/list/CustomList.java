@@ -26,6 +26,7 @@ public class CustomList<T> implements Iterable<T> {
         elements[size++] = element;
     }
 
+    @SuppressWarnings("unchecked")
     public T get(int index) {
         checkIndex(index);
         return (T) elements[index];
@@ -36,6 +37,7 @@ public class CustomList<T> implements Iterable<T> {
         elements[index] = element;
     }
 
+    @SuppressWarnings("unchecked")
     public T remove(int index) {
         checkIndex(index);
         T removedElement = (T) elements[index];
@@ -66,8 +68,6 @@ public class CustomList<T> implements Iterable<T> {
         int newCapacity = Math.max(1, elements.length * 2);
         Object[] newArray = new Object[newCapacity];
         System.arraycopy(elements, 0, newArray, 0, elements.length);
-        // for (int i = 0; i < elements.length; i++) {
-        // newArray[i] = elements[i]; }
         elements = newArray;
     }
 
@@ -78,6 +78,7 @@ public class CustomList<T> implements Iterable<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Iterator<T> iterator() {
         return new Iterator<T>() {
             private int currentIndex = 0;
