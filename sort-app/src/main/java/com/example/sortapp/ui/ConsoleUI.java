@@ -1,11 +1,13 @@
 package com.example.sortapp.ui;
 
 import java.util.Scanner;
+import java.util.function.Function;
 import java.util.List;
 
 import com.example.sortapp.controller.SortController;
 import com.example.sortapp.domain.model.User;
 import com.example.sortapp.util.UserGenerator;
+import com.example.sortapp.validation.UserValidator;
 
 public class ConsoleUI {
     private final SortController controller = new SortController();
@@ -97,13 +99,13 @@ public class ConsoleUI {
     private void manualInputSingle() {
 
         System.out.println("Введите имя:");
-        String name = scanner.nextLine();
+        String name = readStringProperty(UserValidator::validateAndNormalizeName);
 
         System.out.println("Введите email:");
-        String email = scanner.nextLine();
+        String email = readStringProperty(UserValidator::validateAndNormalizeEmail);
 
         System.out.println("Введите год рождения:");
-        int birthYear = readInt();
+        int birthYear = readInt(UserValidator::validateBirthYear);
 
         User user = new User.Builder()
                 .name(name)
@@ -174,6 +176,28 @@ public class ConsoleUI {
                 return Integer.parseInt(scanner.nextLine());
             } catch (Exception e) {
                 System.out.println("Введите число!");
+            }
+        }
+    }
+
+    private int readInt(Function<Integer, Integer> validateMethod) {
+
+        while (true) {
+            try {
+                return validateMethod.apply(readInt());
+            } catch (Exception e) {
+                System.out.println("Не прошло валидацию, введите другое значение! " + e.getMessage());
+            }
+        }
+    }
+
+    private String readStringProperty(Function<String, String> validateMethod) {
+
+        while (true) {
+            try {
+                return validateMethod.apply(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println("Не прошло валидацию, введите другое значение! " + e.getMessage());
             }
         }
     }
