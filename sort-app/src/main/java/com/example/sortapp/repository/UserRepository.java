@@ -9,11 +9,13 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.example.sortapp.collection.CustomList;
+import com.example.sortapp.collection.CustomListAdapter;
 import com.example.sortapp.domain.model.User;
 
 public class UserRepository {
 
-    private final List<User> users = new ArrayList<>();
+    private final List<User> users = new CustomListAdapter<User>(new CustomList<User>());
 
     public void add(User user) {
         users.add(user);
