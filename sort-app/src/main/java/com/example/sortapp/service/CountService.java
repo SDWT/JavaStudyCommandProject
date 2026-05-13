@@ -11,58 +11,37 @@ public class CountService {
     private static final int THREAD_COUNT =
             Runtime.getRuntime().availableProcessors();
 
-    public <T> int countOccurrences(
-            List<T> data,
-            Predicate<T> predicate
-    ) {
+    public <T> int countOccurrences(List<T> data, Predicate<T> predicate) {
 
-        Objects.requireNonNull(
-                data,
-                "Data must not be null"
-        );
+        Objects.requireNonNull(data, "Data must not be null");
 
-        Objects.requireNonNull(
-                predicate,
-                "Predicate must not be null"
-        );
+        Objects.requireNonNull(predicate, "Predicate must not be null");
 
-        if (data.isEmpty()) {
+        if (data.isEmpty())
             return 0;
-        }
 
-        ExecutorService executor =
-                Executors.newFixedThreadPool(THREAD_COUNT);
+        ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
 
-        List<Future<Integer>> futures =
-                new ArrayList<>();
+        List<Future<Integer>> futures = new ArrayList<>();
 
-        int chunkSize = (int) Math.ceil(
-                (double) data.size() / THREAD_COUNT
-        );
+        int chunkSize = (int) Math.ceil((double) data.size() / THREAD_COUNT);
 
         for (int i = 0; i < THREAD_COUNT; i++) {
 
             int start = i * chunkSize;
 
-            int end = Math.min(
-                    start + chunkSize,
-                    data.size()
-            );
+            int end = Math.min(start + chunkSize, data.size());
 
-            if (start >= data.size()) {
+            if (start >= data.size())
                 break;
-            }
 
             Callable<Integer> task = () -> {
 
                 int localCount = 0;
 
-                for (int j = start; j < end; j++) {
-
-                    if (predicate.test(data.get(j))) {
+                for (int j = start; j < end; j++)
+                    if (predicate.test(data.get(j)))
                         localCount++;
-                    }
-                }
 
                 return localCount;
             };
@@ -73,50 +52,29 @@ public class CountService {
         int totalCount = 0;
 
         try {
-
-            for (Future<Integer> future : futures) {
+            for (Future<Integer> future : futures)
                 totalCount += future.get();
-            }
-
-        } catch (
-                InterruptedException e
-        ) {
+        } catch (InterruptedException e) {
 
             Thread.currentThread().interrupt();
 
-            throw new RuntimeException(
-                    "Thread was interrupted",
-                    e
-            );
+            throw new RuntimeException("Thread was interrupted", e);
 
-        } catch (
-                ExecutionException e
-        ) {
+        } catch (ExecutionException e) {
 
-            throw new RuntimeException(
-                    "Error during counting",
-                    e
-            );
+            throw new RuntimeException("Error during counting", e);
 
         } finally {
-
             executor.shutdown();
         }
 
         return totalCount;
     }
 
-    public <T> void printOccurrences(
-            List<T> data,
-            Predicate<T> predicate
-    ) {
+    public <T> void printOccurrences(List<T> data, Predicate<T> predicate) {
 
-        int result =
-                countOccurrences(data, predicate);
+        int result = countOccurrences(data, predicate);
 
-        System.out.println(
-                "Найдено вхождений: "
-                        + result
-        );
+        System.out.println("Найдено вхождений: " + result);
     }
 }
