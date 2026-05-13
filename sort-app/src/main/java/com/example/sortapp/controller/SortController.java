@@ -10,18 +10,20 @@ import com.example.sortapp.strategy.impl.MergeSort;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class SortController {
 
     private final SortService<User> sortService = new SortService<>();
+
     private final UserRepository repository = new UserRepository();
 
     public void addUser(User user) {
-        repository.add(user);
+        repository.add(Objects.requireNonNull(user));
     }
 
     public void addUsers(List<User> users) {
-        repository.addAll(users);
+        repository.addAll(Objects.requireNonNull(users));
     }
 
     public List<User> getAllUsers() {
@@ -36,10 +38,7 @@ public class SortController {
         return repository.size();
     }
 
-    public List<User> sort(
-            List<User> list,
-            int strategyChoice,
-            int comparatorChoice) {
+    public List<User> sort(List<User> list, int strategyChoice, int comparatorChoice) {
 
         SortStrategy<User> strategy = resolveStrategy(strategyChoice);
 
@@ -59,6 +58,7 @@ public class SortController {
     }
 
     private SortStrategy<User> resolveStrategy(int choice) {
+
         return switch (choice) {
             case 1 -> new BubbleSort<>();
             case 2 -> new MergeSort<>();
@@ -68,10 +68,12 @@ public class SortController {
     }
 
     private Comparator<User> resolveComparator(int choice) {
+
         return switch (choice) {
             case 1 -> User.BY_NAME;
             case 2 -> User.BY_EMAIL;
             case 3 -> User.BY_BIRTH_YEAR;
+            case 4 -> User.BY_NAME_EMAIL_BIRTH_YEAR;
             default -> throw new IllegalArgumentException("Invalid comparator");
         };
     }

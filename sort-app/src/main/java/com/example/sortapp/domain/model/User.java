@@ -5,7 +5,7 @@ import com.example.sortapp.validation.UserValidator;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class User implements Comparable<User> {
+public final class User implements Comparable<User> {
 
     public static final Comparator<User> BY_NAME = Comparator.comparing(User::getName);
     public static final Comparator<User> BY_EMAIL = Comparator.comparing(User::getEmail);
@@ -18,22 +18,27 @@ public class User implements Comparable<User> {
     private final String email;
     private final int birthYear;
 
-    private User(Builder userBuilder) {
-        this.name = UserValidator.validateAndNormalizeName(userBuilder.name);
-        this.email = UserValidator.validateAndNormalizeEmail(userBuilder.email);
-        this.birthYear = UserValidator.validateBirthYear(userBuilder.birthYear);
+    private User(Builder builder) {
+        this.name = UserValidator.validateAndNormalizeName(builder.name);
+        this.email = UserValidator.validateAndNormalizeEmail(builder.email);
+        this.birthYear = UserValidator.validateBirthYear(builder.birthYear);
     }
 
     public String getName() {
         return name;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public int getBirthYear() {
         return birthYear;
     }
 
-    public String getEmail() {
-        return email;
+    @Override
+    public int compareTo(User other) {
+        return BY_NAME_EMAIL_BIRTH_YEAR.compare(this, other);
     }
 
     @Override
@@ -42,7 +47,7 @@ public class User implements Comparable<User> {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-
+        
         User user = (User) o;
         return birthYear == user.birthYear && Objects.equals(name, user.name) && Objects.equals(email, user.email);
     }
@@ -54,17 +59,8 @@ public class User implements Comparable<User> {
 
     @Override
     public String toString() {
-        return "User{" +
-                "name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", birthYear=" + birthYear +
-                '}';
-    }
-
-    @Override
-    public int compareTo(User other) {
-        return BY_NAME_EMAIL_BIRTH_YEAR
-                .compare(this, other);
+        return "User{name='%s', email='%s', birthYear=%d}"
+                .formatted(name, email, birthYear);
     }
 
     public static class Builder {
@@ -90,6 +86,5 @@ public class User implements Comparable<User> {
         public User build() {
             return new User(this);
         }
-
     }
 }
