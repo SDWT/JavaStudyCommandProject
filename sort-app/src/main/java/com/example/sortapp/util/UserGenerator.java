@@ -1,13 +1,17 @@
 package com.example.sortapp.util;
 
 import java.time.Year;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import com.example.sortapp.domain.model.User;
 
-public class UserGenerator {
+public final class UserGenerator {
+
+    private static final int MIN_YEAR = 1900;
+
+    private UserGenerator() {}
 
     public static List<User> generate(int size) {
         return generate(size, new Random());
@@ -18,13 +22,9 @@ public class UserGenerator {
             throw new IllegalArgumentException("Size must be >= 0");
         }
 
-        List<User> users = new ArrayList<>(size);
-
-        for (int i = 0; i < size; i++) {
-            users.add(generateOne(random));
-        }
-
-        return users;
+        return IntStream.range(0, size)
+                .mapToObj(i -> generateOne(random))
+                .toList();
     }
 
     private static User generateOne(Random random) {
@@ -35,7 +35,7 @@ public class UserGenerator {
         return new User.Builder()
                 .name(name)
                 .email(name + "@example.com")
-                .birthYear(random.nextInt(1900, currentYear))
+                .birthYear(random.nextInt(MIN_YEAR, currentYear + 1))
                 .build();
     }
 }
