@@ -1,24 +1,25 @@
 package com.example.sortapp.validation;
 
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 public final class UserValidator {
     private static final int MIN_YEAR = 1900;
     private static final Pattern NAME_PATTERN = Pattern.compile("^[А-ЯA-Zа-яa-z]+([\\s'-][А-Яа-яA-Za-z]+)*$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._-]+@[A-Za-z]+\\.[A-Za-z.]+$");
 
-    private  UserValidator(){
+    private UserValidator() {
 
     }
 
     public static String validateAndNormalizeEmail(String email) {
         String validatedEmail = Objects.requireNonNull(email, "email не может быть null")
                 .trim();
-        Matcher emailMatcher = EMAIL_PATTERN.matcher(validatedEmail);
-        if (!emailMatcher.matches()) {
+        if (validatedEmail.isBlank()) {
+            throw new IllegalArgumentException("Email не может быть пустым");
+        }
+        
+        if (!EMAIL_PATTERN.matcher(validatedEmail).matches()) {
             throw new IllegalArgumentException("Некорректная почта");
         }
         return validatedEmail.toLowerCase();
@@ -31,8 +32,7 @@ public final class UserValidator {
             throw new IllegalArgumentException("Поле name должно состоять минимум из 2х символов");
         }
 
-        Matcher nameMatcher = NAME_PATTERN.matcher(validatedName);
-        if (!nameMatcher.matches()) {
+        if (!NAME_PATTERN.matcher(validatedName).matches()) {
             throw new IllegalArgumentException("Поле name не может содержать цифры и спец символы");
         }
 
