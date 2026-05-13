@@ -11,6 +11,8 @@ public final class UserGenerator {
 
     private static final int MIN_YEAR = 1900;
 
+    private static final char[] alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+
     private UserGenerator() {}
 
     public static List<User> generate(int size) {
@@ -28,7 +30,7 @@ public final class UserGenerator {
     }
 
     private static User generateOne(Random random) {
-        String name = "user" + random.nextInt(10);
+        String name = "user" + alphabet[random.nextInt(alphabet.length)];
 
         int currentYear = Year.now().getValue();
 
