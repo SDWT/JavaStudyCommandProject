@@ -5,6 +5,7 @@ import com.example.sortapp.repository.UserRepository;
 import com.example.sortapp.service.SortService;
 import com.example.sortapp.strategy.SortStrategy;
 import com.example.sortapp.strategy.impl.BubbleSort;
+import com.example.sortapp.strategy.impl.EvenBirthYearSortStrategy;
 import com.example.sortapp.strategy.impl.MergeSort;
 
 import java.util.Comparator;
@@ -61,6 +62,7 @@ public class SortController {
         return switch (choice) {
             case 1 -> new BubbleSort<>();
             case 2 -> new MergeSort<>();
+            case 3 -> new EvenBirthYearSortStrategy(new BubbleSort<>());
             default -> throw new IllegalArgumentException("Invalid strategy");
         };
     }
